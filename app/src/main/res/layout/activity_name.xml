@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e7f4ff"
+    tools:context=".NameActivity">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="294dp"
+        android:layout_height="89dp"
+        android:layout_marginTop="60dp"
+        android:text="PEANUT"
+        android:textAlignment="center"
+        android:textColor="#040404"
+        android:textSize="60sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageViewPeanut"
+        android:layout_width="242dp"
+        android:layout_height="294dp"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/peanut"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+
+    <EditText
+        android:id="@+id/editTextName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:ems="10"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:background="@drawable/edit_text_background"
+        android:gravity="center"
+        android:padding="16dp"
+        android:hint="NAME.."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageViewPeanut" />
+
+    <Button
+        android:id="@+id/buttonSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="SUBMIT"
+        app:backgroundTint="@color/button_color_state"
+        app:cornerRadius="100dp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextName" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

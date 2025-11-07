@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#efffe7">
+
+    <TextView
+        android:id="@+id/textViewRoomName"
+        android:layout_width="241dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/room_name_background"
+
+        android:text="EAT"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="8dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/buttonArrowLeft"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@null"
+        android:contentDescription="Previous Room"
+        android:src="@drawable/outline_arrow_left"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewRoomName"
+        app:layout_constraintEnd_toStartOf="@+id/textViewRoomName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textViewRoomName" />
+
+    <ImageButton
+        android:id="@+id/buttonArrowRight"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@null"
+        android:contentDescription="Next Room"
+        android:src="@drawable/outline_arrow_right"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewRoomName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textViewRoomName"
+        app:layout_constraintTop_toTopOf="@+id/textViewRoomName" />
+
+    <TextView
+        android:id="@+id/textViewPetName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="NAME.."
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewRoomName" />
+
+    <ImageView
+        android:id="@+id/iconPlay"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="Play Status Icon"
+        android:src="@drawable/play_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewPetName" />
+
+    <ProgressBar
+        android:id="@+id/progressBarPlay"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="32dp"
+
+        android:max="100"
+        android:progress="70"
+        android:progressTint="#FF6BAA"
+
+        app:layout_constraintBottom_toBottomOf="@+id/iconPlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iconPlay"
+        app:layout_constraintTop_toTopOf="@+id/iconPlay" />
+
+    <ImageView
+        android:id="@+id/iconFood"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Food Status Icon"
+        android:src="@drawable/eat_icon"
+        app:layout_constraintStart_toStartOf="@+id/iconPlay"
+        app:layout_constraintTop_toBottomOf="@+id/iconPlay" />
+
+    <ProgressBar
+        android:id="@+id/progressBarFood"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="32dp"
+
+        android:max="100"
+        android:progress="50"
+        android:progressTint="#7CFC00"
+
+        app:layout_constraintBottom_toBottomOf="@+id/iconFood"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iconFood"
+        app:layout_constraintTop_toTopOf="@+id/iconFood" />
+
+    <ImageView
+        android:id="@+id/iconSleep"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Sleep Status Icon"
+        android:src="@drawable/sleep_icon"
+        app:layout_constraintStart_toStartOf="@+id/iconFood"
+        app:layout_constraintTop_toBottomOf="@+id/iconFood" />
+
+    <ProgressBar
+        android:id="@+id/progressBarSleep"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="32dp"
+
+        android:max="100"
+        android:progress="80"
+        android:progressTint="#FFD700"
+
+        app:layout_constraintBottom_toBottomOf="@+id/iconSleep"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iconSleep"
+        app:layout_constraintTop_toTopOf="@+id/iconSleep" />
+
+    <ImageView
+        android:id="@+id/imageViewPeanut"
+        android:layout_width="196dp"
+        android:layout_height="270dp"
+        android:layout_marginTop="32dp"
+        android:contentDescription="Peanut Character"
+        android:src="@drawable/peanut"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBarSleep" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/buttonWorm"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="16dp"
+            android:background="@null"
+            android:contentDescription="Eat worm"
+            android:scaleType="fitCenter"
+            android:src="@drawable/worm" />
+
+        <ImageButton
+            android:id="@+id/buttonSunset"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@null"
+            android:contentDescription="Eat Sunset"
+            android:scaleType="fitCenter"
+            android:src="@drawable/sunset" />
+
+        <ImageButton
+            android:id="@+id/buttonWater"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="16dp"
+            android:background="@null"
+            android:contentDescription="Eat Water"
+            android:scaleType="fitCenter"
+            android:src="@drawable/water" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
