@@ -64,12 +64,12 @@ class SleepFragment : Fragment() {
         // *** แก้ไขแล้ว (2) ***
         binding.buttonArrowLeft.setOnClickListener {
             if (isSleeping) return@setOnClickListener
-            viewPager.currentItem = 1 // ไปหน้า Eat
+            (activity as MainActivity).binding.viewPager.currentItem = 1 // ไปหน้า Eat
         }
         // *** แก้ไขแล้ว (3) ***
         binding.buttonArrowRight.setOnClickListener {
             if (isSleeping) return@setOnClickListener
-            viewPager.currentItem = 0 // ไปหน้า Play
+            (activity as MainActivity).binding.viewPager.currentItem = 0 // ไปหน้า Play
         }
 
         binding.buttonPillow.setOnClickListener {

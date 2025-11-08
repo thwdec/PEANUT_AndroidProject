@@ -1,5 +1,6 @@
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.lifecycle.MutableLiveData
 
 object PetManager {
 
@@ -11,6 +12,9 @@ object PetManager {
     private const val KEY_HAPPINESS = "PET_HAPPINESS"
     private const val KEY_HUNGER = "PET_HUNGER"
     private const val KEY_ENERGY = "PET_ENERGY"
+
+    // Check game over
+    val onGameOver = MutableLiveData<Boolean>()
 
     // ค่าเริ่มต้น
     private const val DEFAULT_STAT = 50
@@ -39,15 +43,34 @@ object PetManager {
 
     var happiness: Int
         get() = prefs.getInt(KEY_HAPPINESS, DEFAULT_STAT)
-        set(value) = saveInt(KEY_HAPPINESS, value.coerceIn(0, 100)) // 👈 coerceIn คือการบังคับให้อยู่ระหว่าง 0-100
+        set(value) {
+            val newValue = value.coerceIn(0, 100)
+            saveInt(KEY_HAPPINESS, newValue) // บังคับให้อยู่ระหว่าง 0-100
+            if (newValue <= 0) {
+                onGameOver.postValue(true) // gameover
+            }
+        }
+
 
     var hunger: Int
         get() = prefs.getInt(KEY_HUNGER, DEFAULT_STAT)
-        set(value) = saveInt(KEY_HUNGER, value.coerceIn(0, 100))
+        set(value) {
+            val newValue = value.coerceIn(0, 100)
+            saveInt(KEY_HUNGER, newValue)
+            if (newValue <= 0) {
+                onGameOver.postValue(true)
+            }
+        }
 
     var energy: Int
         get() = prefs.getInt(KEY_ENERGY, DEFAULT_STAT)
-        set(value) = saveInt(KEY_ENERGY, value.coerceIn(0, 100))
+        set(value) {
+            val newValue= value.coerceIn(0, 100)
+            saveInt(KEY_ENERGY, newValue)
+            if (newValue <= 0) {
+                onGameOver.postValue(true)
+            }
+        }
 
     // ฟังก์ชันสำหรับรีเซ็ตค่า เมื่อเริ่มเกมใหม่
     fun startNewGame(name: String) {

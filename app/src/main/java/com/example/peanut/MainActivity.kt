@@ -3,6 +3,7 @@ package com.example.peanut
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.peanut.databinding.ActivityMainBinding
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -17,6 +18,19 @@ class MainActivity : AppCompatActivity() {
         adapter = ViewPagerAdapter(this)
 
         binding.viewPager.adapter = adapter
-        binding.viewPager.isUserInputEnabled = false
+        binding.viewPager.isUserInputEnabled = true
+
+        // chech onGameOver at PetManager
+        PetManager.onGameOver.observe(this) { isGameOver ->
+            if (isGameOver) {
+                // Intent to GameOver page
+                PetManager.onGameOver.postValue(false)
+
+                val intent = Intent(this, GameOverActivity::class.java)
+                startActivity(intent)
+
+                finish()
+            }
+        }
     }
 }

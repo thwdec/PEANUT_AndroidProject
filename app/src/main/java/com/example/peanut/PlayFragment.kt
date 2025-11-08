@@ -57,11 +57,11 @@ class PlayFragment : Fragment() {
 
         // *** แก้ไขแล้ว (2) ***
         binding.buttonArrowLeft.setOnClickListener {
-            viewPager.currentItem = 2 // ไปหน้า Sleep (หน้าสุดท้าย)
+            (activity as MainActivity).binding.viewPager.currentItem = 2 // ไปหน้า Sleep (หน้าสุดท้าย)
         }
         // *** แก้ไขแล้ว (3) ***
         binding.buttonArrowRight.setOnClickListener {
-            viewPager.currentItem = 1 // ไปหน้า Eat
+            (activity as MainActivity).binding.viewPager.currentItem = 1 // ไปหน้า Eat
         }
 
         // 2. ปุ่มไอเท็ม (ID เหล่านี้ถูกต้องแล้วตามโค้ดเก่าของคุณ)

@@ -60,11 +60,11 @@ class EatFragment : Fragment() {
 
         // *** แก้ไขแล้ว (2) ***
         binding.buttonArrowLeft.setOnClickListener {
-            viewPager.currentItem = 0 // ไปหน้า Play (index 0)
+            (activity as MainActivity).binding.viewPager.currentItem = 0 // ไปหน้า Play (index 0)
         }
         // *** แก้ไขแล้ว (3) ***
         binding.buttonArrowRight.setOnClickListener {
-            viewPager.currentItem = 2 // ไปหน้า Sleep (index 2)
+            (activity as MainActivity).binding.viewPager.currentItem = 2 // ไปหน้า Sleep (index 2)
         }
 
         // 2. ปุ่มไอเท็ม (ID เหล่านี้ถูกต้องแล้วตามโค้ดเก่าของคุณ)
@@ -75,7 +75,7 @@ class EatFragment : Fragment() {
         }
         binding.buttonSunset.setOnClickListener {
             PetManager.happiness += 5
-            PetManager.energy += 5
+            PetManager.hunger += 5
             loadPetState()
         }
         binding.buttonWater.setOnClickListener {
