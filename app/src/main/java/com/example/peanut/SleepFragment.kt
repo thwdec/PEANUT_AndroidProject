@@ -1,145 +1,164 @@
-package com.example.peanut // <-- ต้องเป็นชื่อ package ของคุณ
+package com.example.peanut
 
-// 1. Import สิ่งที่จำเป็น
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.example.peanut.databinding.FragmentSleepBinding // <-- Import คลาส Binding ที่ถูกสร้างอัตโนมัติ
+import com.example.peanut.databinding.FragmentSleepBinding
 
 class SleepFragment : Fragment() {
 
-    // 2. สร้างตัวแปรสำหรับ View Binding
-    //    (ชื่อ FragmentPlayBinding มาจากชื่อไฟล์ fragment_play.xml)
     private var _binding: FragmentSleepBinding? = null
-    private val binding get() = _binding!! // ตัวแปรนี้ช่วยให้เราเรียกใช้ UI ได้ง่ายๆ
-    // "สถานะ"เปิด/ปิด ไฟ
-    private var isLightsOn = true
+    private val binding get() = _binding!!
 
-    // 3. แก้ไข onCreateView เพื่อใช้ View Binding
+    private var isLightsOn = true
+    private var isSleeping = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // สร้าง "ตัวเชื่อม" UI
         _binding = FragmentSleepBinding.inflate(inflater, container, false)
-        // ส่ง "หน้าตา" (root view) กลับไป
         return binding.root
     }
 
-    // 4. onViewCreated - ฟังก์ชันนี้จะทำงานหลังจาก UI ถูกสร้างเสร็จ
-    //    นี่คือที่ที่เราจะเขียนลอจิกทั้งหมด (เช่น การคลิกปุ่ม)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // --- ตั้งค่าเริ่มต้น ---
-        // เมื่อหน้าเปิดครั้งแรก ให้อัปเดตสี ProgressBar ทันที
-        updatePlayProgress(70) // สมมติค่าเริ่มต้น
-        updateFoodProgress(50) // สมมติค่าเริ่มต้น
-        updateSleepProgress(80) // สมมติค่าเริ่มต้น
+        // ซ่อน ZZZ (ที่เราเพิ่งเพิ่มใน XML) ไว้ก่อน
+        binding.tvZzz.visibility = View.GONE
 
-        // --- ตั้งค่าการคลิกปุ่ม ---
-        binding.buttonPillow.setOnClickListener {
-            // เมื่อกดปุ่มบอล ให้เพิ่มค่า "เล่น" (Play)
-            // เราจะเอาค่าปัจจุบันมาบวกเพิ่ม 10
-            val currentProgress = binding.progressBarSleep.progress
-            updatePlayProgress(currentProgress + 10)
+        updateLightUI()
+        setupListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadPetState()
+    }
+
+    private fun loadPetState() {
+        val happiness = PetManager.happiness
+        val hunger = PetManager.hunger
+        val energy = PetManager.energy
+
+        // *** แก้ไขแล้ว (1) ***
+        binding.textViewPetName.text = PetManager.petName
+
+        binding.progressBarPlay.progress = happiness
+        binding.progressBarFood.progress = hunger
+        binding.progressBarSleep.progress = energy
+
+        updateAllBarColors(happiness, hunger, energy)
+    }
+
+    private fun setupListeners() {
+        val viewPager = (activity as MainActivity).binding.viewPager
+
+        // *** แก้ไขแล้ว (2) ***
+        binding.buttonArrowLeft.setOnClickListener {
+            if (isSleeping) return@setOnClickListener
+            viewPager.currentItem = 1 // ไปหน้า Eat
+        }
+        // *** แก้ไขแล้ว (3) ***
+        binding.buttonArrowRight.setOnClickListener {
+            if (isSleeping) return@setOnClickListener
+            viewPager.currentItem = 0 // ไปหน้า Play
         }
 
-        // 2. ตั้งค่าการคลิกปุ่มโคมไฟ (buttonLamp)
+        binding.buttonPillow.setOnClickListener {
+            if (!isSleeping) {
+                goToSleep()
+            }
+        }
+
         binding.buttonLamp.setOnClickListener {
-            // เมื่อถูกคลิก ให้เรียกฟังก์ชันสลับไฟ
+            if (isSleeping) return@setOnClickListener
             toggleLights()
         }
-        // (คุณอาจจะต้องตั้งค่าเริ่มต้นให้ UI ตรงกับ isLightsOn = true ด้วย)
-        updateLightUI()
-
     }
 
-    // 3. สร้างฟังก์ชันสำหรับ "สลับไฟ"
+    private fun goToSleep() {
+        isSleeping = true
+
+        if (isLightsOn) {
+            isLightsOn = false
+            updateLightUI()
+        }
+
+        // *** แก้ไขแล้ว (4) ***
+        // นี่คือ id ของรูป Peanut
+        binding.imageViewPeanut.animate().translationY(150f).setDuration(500).start()
+
+        // นี่คือ id ของ Zzz ที่เราเพิ่งเพิ่มใน XML
+        binding.tvZzz.visibility = View.VISIBLE
+
+        PetManager.energy += 40
+        PetManager.hunger -= 10
+        loadPetState()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            wakeUp()
+        }, 3000)
+    }
+
+    private fun wakeUp() {
+        isSleeping = false
+
+        // *** แก้ไขแล้ว (5) ***
+        binding.imageViewPeanut.animate().translationY(0f).setDuration(500).start()
+        binding.tvZzz.visibility = View.GONE
+
+        loadPetState()
+    }
+
     private fun toggleLights() {
-        // 3.1 สลับค่าสถานะ (true เป็น false, false เป็น true)
         isLightsOn = !isLightsOn
-
-        // 3.2 อัปเดต UI ตามสถานะใหม่
         updateLightUI()
 
-        // 3.3 (ลอจิกเกม) ถ้าปิดไฟ ค่า "การนอน" ควรจะเพิ่มขึ้น!
-        if (!isLightsOn) { // ถ้าไฟปิด
-            // สมมติว่าการปิดไฟช่วยเพิ่มค่านอน 20
-            val currentSleep = binding.progressBarSleep.progress
-            updateSleepProgress(currentSleep + 20)
+        if (!isLightsOn) {
+            PetManager.energy += 10
+            loadPetState()
         }
     }
 
-    // 4. สร้างฟังก์ชันสำหรับ "อัปเดต UI" (แยกออกมาให้ชัดเจน)
+    // ฟังก์ชันนี้ OK แล้ว เพราะ XML ของคุณมี @color/sleep_background_light
     private fun updateLightUI() {
-        if (isLightsOn) { //เปิดไฟ
-            binding.root.setBackgroundColor(
-                ContextCompat.getColor(requireContext(), R.color.sleep_background_light)
-            )
-
-        } else {//ปิดไฟ
-            binding.root.setBackgroundColor(
-                ContextCompat.getColor(requireContext(), R.color.sleep_background_dark)
-            )
-            //binding.buttonLamp.setImageResource(R.drawable.ic_lamp_off) // (ใช้ชื่อรูปของคุณ)
+        val colorRes = if (isLightsOn) {
+            R.color.sleep_background_light
+        } else {
+            R.color.sleep_background_dark // 👈 (ต้องแน่ใจว่ามีสีนี้ใน colors.xml)
         }
+        binding.root.setBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))
     }
 
-    // 5. นี่คือฟังก์ชันที่เราจะใช้เปลี่ยนสี ProgressBar (สำหรับหลอด "Play")
-    private fun updatePlayProgress(newValue: Int) {
 
-        // กันไม่ให้ค่าเกิน 100 หรือต่ำกว่า 0
-        val finalValue = newValue.coerceIn(0, 100)
-
-        // 5.1 อัปเดตค่าตัวเลขในหลอด
-        binding.progressBarPlay.progress = finalValue
-
-        // 5.2 เลือกสีตามเงื่อนไข (n)
-        val colorRes = when {
-            finalValue <= 20 -> R.color.status_red     // ถ้าน้อยกว่าหรือเท่ากับ 20
-            finalValue <= 50 -> R.color.status_yellow  // ถ้าน้อยกว่าหรือเท่ากับ 50 (และมากกว่า 20)
-            else -> R.color.status_green               // ค่าอื่นๆ (มากกว่า 50)
-        }
-
-        // 5.3 สั่งเปลี่ยนสีหลอด (Tint)
-        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))
-        binding.progressBarPlay.progressTintList = colorStateList
+    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
+    private fun updateAllBarColors(play: Int, food: Int, sleep: Int) {
+        // XML ของคุณใช้สีชมพู/เขียว/เหลือง แต่ Logic ของเราจะเปลี่ยนสีตามพลัง
+        // เราจะยึดตาม Logic นี้
+        updateBarColor(binding.progressBarPlay, play, R.color.status_green) // 👈 (ต้องมีสีนี้)
+        updateBarColor(binding.progressBarFood, food, R.color.status_green)
+        updateBarColor(binding.progressBarSleep, sleep, R.color.status_green)
     }
 
-    // 6. (ตัวอย่าง) คุณสามารถสร้างฟังก์ชันสำหรับหลอดอื่นๆ ได้เหมือนกัน
-    private fun updateFoodProgress(newValue: Int) {
-        val finalValue = newValue.coerceIn(0, 100)
-        binding.progressBarFood.progress = finalValue
-
+    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
+    private fun updateBarColor(progressBar: ProgressBar, value: Int, defaultColorRes: Int) {
         val colorRes = when {
-            finalValue <= 20 -> R.color.status_red
-            finalValue <= 50 -> R.color.status_yellow
-            else -> R.color.status_green
+            value <= 20 -> R.color.status_red
+            value <= 50 -> R.color.status_yellow
+            else -> defaultColorRes
         }
         val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))
-        binding.progressBarFood.progressTintList = colorStateList
+        progressBar.progressTintList = colorStateList
     }
 
-    private fun updateSleepProgress(newValue: Int) {
-        val finalValue = newValue.coerceIn(0, 100)
-        binding.progressBarSleep.progress = finalValue
-
-        val colorRes = when {
-            finalValue <= 20 -> R.color.status_red
-            finalValue <= 50 -> R.color.status_yellow
-            else -> R.color.status_green
-        }
-        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))
-        binding.progressBarSleep.progressTintList = colorStateList
-    }
-
-
-    // 7. (สำคัญ) คืนค่า Binding เมื่อ Fragment ถูกทำลาย เพื่อป้องกัน Memory Leak
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

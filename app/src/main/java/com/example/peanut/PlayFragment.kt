@@ -1,115 +1,104 @@
-package com.example.peanut // <-- ต้องเป็นชื่อ package ของคุณ
+package com.example.peanut
 
-// 1. Import สิ่งที่จำเป็น
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.example.peanut.databinding.FragmentPlayBinding // <-- Import คลาส Binding ที่ถูกสร้างอัตโนมัติ
+import com.example.peanut.databinding.FragmentPlayBinding
 
 class PlayFragment : Fragment() {
 
-    // 2. สร้างตัวแปรสำหรับ View Binding
-    //    (ชื่อ FragmentPlayBinding มาจากชื่อไฟล์ fragment_play.xml)
     private var _binding: FragmentPlayBinding? = null
-    private val binding get() = _binding!! // ตัวแปรนี้ช่วยให้เราเรียกใช้ UI ได้ง่ายๆ
+    private val binding get() = _binding!!
 
-    // 3. แก้ไข onCreateView เพื่อใช้ View Binding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // สร้าง "ตัวเชื่อม" UI
         _binding = FragmentPlayBinding.inflate(inflater, container, false)
-        // ส่ง "หน้าตา" (root view) กลับไป
         return binding.root
     }
 
-    // 4. onViewCreated - ฟังก์ชันนี้จะทำงานหลังจาก UI ถูกสร้างเสร็จ
-    //    นี่คือที่ที่เราจะเขียนลอจิกทั้งหมด (เช่น การคลิกปุ่ม)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupListeners()
+    }
 
-        // --- ตั้งค่าเริ่มต้น ---
-        // เมื่อหน้าเปิดครั้งแรก ให้อัปเดตสี ProgressBar ทันที
-        updatePlayProgress(70) // สมมติค่าเริ่มต้น
-        updateFoodProgress(50) // สมมติค่าเริ่มต้น
-        updateSleepProgress(80) // สมมติค่าเริ่มต้น
+    override fun onResume() {
+        super.onResume()
+        loadPetState()
+    }
 
-        // --- ตั้งค่าการคลิกปุ่ม ---
+    private fun loadPetState() {
+        val happiness = PetManager.happiness
+        val hunger = PetManager.hunger
+        val energy = PetManager.energy
+
+        // 2. อัปเดตชื่อ
+        // *** แก้ไขแล้ว (1) ***
+        binding.textViewPetName.text = PetManager.petName
+
+        // 3. อัปเดตตัวเลขในหลอด
+        binding.progressBarPlay.progress = happiness
+        binding.progressBarFood.progress = hunger
+        binding.progressBarSleep.progress = energy
+
+        // 4. สั่งอัปเดตสี!
+        updateAllBarColors(happiness, hunger, energy)
+    }
+
+    private fun setupListeners() {
+        // 1. ปุ่มลูกศร (เชื่อมกับ ViewPager ใน MainActivity)
+        val viewPager = (activity as MainActivity).binding.viewPager
+
+        // *** แก้ไขแล้ว (2) ***
+        binding.buttonArrowLeft.setOnClickListener {
+            viewPager.currentItem = 2 // ไปหน้า Sleep (หน้าสุดท้าย)
+        }
+        // *** แก้ไขแล้ว (3) ***
+        binding.buttonArrowRight.setOnClickListener {
+            viewPager.currentItem = 1 // ไปหน้า Eat
+        }
+
+        // 2. ปุ่มไอเท็ม (ID เหล่านี้ถูกต้องแล้วตามโค้ดเก่าของคุณ)
         binding.buttonBall.setOnClickListener {
-            // เมื่อกดปุ่มบอล ให้เพิ่มค่า "เล่น" (Play)
-            // เราจะเอาค่าปัจจุบันมาบวกเพิ่ม 10
-            val currentProgress = binding.progressBarPlay.progress
-            updatePlayProgress(currentProgress + 10)
+            PetManager.happiness += 15
+            PetManager.energy -= 10
+            loadPetState()
         }
-
         binding.buttonMusic.setOnClickListener {
-            // เมื่อกดปุ่มไมค์ ก็เพิ่มค่า "เล่น" (Play) เหมือนกัน
-            val currentProgress = binding.progressBarPlay.progress
-            updatePlayProgress(currentProgress + 15) // อาจจะเพิ่มไม่เท่ากัน
+            PetManager.happiness += 10
+            PetManager.energy -= 5
+            loadPetState()
         }
-
         binding.buttonIpad.setOnClickListener {
-            // เมื่อกดปุ่มไมค์ ก็เพิ่มค่า "เล่น" (Play) เหมือนกัน
-            val currentProgress = binding.progressBarPlay.progress
-            updatePlayProgress(currentProgress + 15) // อาจจะเพิ่มไม่เท่ากัน
+            PetManager.happiness += 5
+            PetManager.energy -= 2
+            loadPetState()
         }
     }
 
-    // 5. นี่คือฟังก์ชันที่เราจะใช้เปลี่ยนสี ProgressBar (สำหรับหลอด "Play")
-    private fun updatePlayProgress(newValue: Int) {
 
-        // กันไม่ให้ค่าเกิน 100 หรือต่ำกว่า 0
-        val finalValue = newValue.coerceIn(0, 100)
-
-        // 5.1 อัปเดตค่าตัวเลขในหลอด
-        binding.progressBarPlay.progress = finalValue
-
-        // 5.2 เลือกสีตามเงื่อนไข (n)
-        val colorRes = when {
-            finalValue <= 20 -> R.color.status_red     // ถ้าน้อยกว่าหรือเท่ากับ 20
-            finalValue <= 50 -> R.color.status_yellow  // ถ้าน้อยกว่าหรือเท่ากับ 50 (และมากกว่า 20)
-            else -> R.color.status_green               // ค่าอื่นๆ (มากกว่า 50)
-        }
-
-        // 5.3 สั่งเปลี่ยนสีหลอด (Tint)
-        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))
-        binding.progressBarPlay.progressTintList = colorStateList
+    private fun updateAllBarColors(play: Int, food: Int, sleep: Int) {
+        updateBarColor(binding.progressBarPlay, play, R.color.status_green)
+        updateBarColor(binding.progressBarFood, food, R.color.status_green)
+        updateBarColor(binding.progressBarSleep, sleep, R.color.status_green)
     }
 
-    // 6. (ตัวอย่าง) คุณสามารถสร้างฟังก์ชันสำหรับหลอดอื่นๆ ได้เหมือนกัน
-    private fun updateFoodProgress(newValue: Int) {
-        val finalValue = newValue.coerceIn(0, 100)
-        binding.progressBarFood.progress = finalValue
-
+    private fun updateBarColor(progressBar: ProgressBar, value: Int, defaultColorRes: Int) {
         val colorRes = when {
-            finalValue <= 20 -> R.color.status_red
-            finalValue <= 50 -> R.color.status_yellow
-            else -> R.color.status_green
+            value <= 20 -> R.color.status_red
+            value <= 50 -> R.color.status_yellow
+            else -> defaultColorRes
         }
         val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))
-        binding.progressBarFood.progressTintList = colorStateList
+        progressBar.progressTintList = colorStateList
     }
 
-    private fun updateSleepProgress(newValue: Int) {
-        val finalValue = newValue.coerceIn(0, 100)
-        binding.progressBarSleep.progress = finalValue
-
-        val colorRes = when {
-            finalValue <= 20 -> R.color.status_red
-            finalValue <= 50 -> R.color.status_yellow
-            else -> R.color.status_green
-        }
-        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))
-        binding.progressBarSleep.progressTintList = colorStateList
-    }
-
-
-    // 7. (สำคัญ) คืนค่า Binding เมื่อ Fragment ถูกทำลาย เพื่อป้องกัน Memory Leak
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
