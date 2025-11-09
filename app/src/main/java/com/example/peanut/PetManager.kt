@@ -1,6 +1,8 @@
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
+import android.os.Handler
+import android.os.Looper
 
 object PetManager {
 
@@ -15,7 +17,8 @@ object PetManager {
 
     // Check game over
     val onGameOver = MutableLiveData<Boolean>()
-
+    private const val DECAY_INTERVAL = 30000L //เวลาลด
+    private val timerHandler = Handler(Looper.getMainLooper()) //แจ้งเตือนเวลาครบลูป
     // ค่าเริ่มต้น
     private const val DEFAULT_STAT = 50
 

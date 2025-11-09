@@ -87,19 +87,17 @@ class SleepFragment : Fragment() {
     private fun goToSleep() {
         isSleeping = true
 
-        if (isLightsOn) {
-            isLightsOn = false
-            updateLightUI()
-        }
-
-        // *** แก้ไขแล้ว (4) ***
-        // นี่คือ id ของรูป Peanut
         binding.imageViewPeanut.animate().translationY(150f).setDuration(500).start()
-
-        // นี่คือ id ของ Zzz ที่เราเพิ่งเพิ่มใน XML
         binding.tvZzz.visibility = View.VISIBLE
 
-        PetManager.energy += 40
+        if (!isLightsOn) {
+
+            PetManager.energy += 30
+        } else {
+
+            PetManager.energy += 5
+        }
+
         PetManager.hunger -= 10
         loadPetState()
 
@@ -111,7 +109,6 @@ class SleepFragment : Fragment() {
     private fun wakeUp() {
         isSleeping = false
 
-        // *** แก้ไขแล้ว (5) ***
         binding.imageViewPeanut.animate().translationY(0f).setDuration(500).start()
         binding.tvZzz.visibility = View.GONE
 
@@ -138,13 +135,17 @@ class SleepFragment : Fragment() {
         binding.root.setBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))
     }
 
+
+    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
     private fun updateAllBarColors(play: Int, food: Int, sleep: Int) {
-        // ของเราจะเปลี่ยนสีตามพลัง
-        updateBarColor(binding.progressBarPlay, play, R.color.status_green) // 👈 (ต้องมีสีนี้)
+        // XML ของคุณใช้สีชมพู/เขียว/เหลือง แต่ Logic ของเราจะเปลี่ยนสีตามพลัง
+        // เราจะยึดตาม Logic นี้
+        updateBarColor(binding.progressBarPlay, play, R.color.status_green)
         updateBarColor(binding.progressBarFood, food, R.color.status_green)
         updateBarColor(binding.progressBarSleep, sleep, R.color.status_green)
     }
 
+    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
     private fun updateBarColor(progressBar: ProgressBar, value: Int, defaultColorRes: Int) {
         val colorRes = when {
             value <= 20 -> R.color.status_red

@@ -1,0 +1,57 @@
+Index: app/src/main/java/com/example/peanut/SleepFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.peanut\r\n\r\nimport android.content.res.ColorStateList\r\nimport android.os.Bundle\r\nimport android.os.Handler\r\nimport android.os.Looper\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport android.widget.ProgressBar\r\nimport androidx.core.content.ContextCompat\r\nimport androidx.fragment.app.Fragment\r\nimport com.example.peanut.databinding.FragmentSleepBinding\r\n\r\nclass SleepFragment : Fragment() {\r\n\r\n    private var _binding: FragmentSleepBinding? = null\r\n    private val binding get() = _binding!!\r\n\r\n    private var isLightsOn = true\r\n    private var isSleeping = false\r\n\r\n    override fun onCreateView(\r\n        inflater: LayoutInflater, container: ViewGroup?,\r\n        savedInstanceState: Bundle?\r\n    ): View {\r\n        _binding = FragmentSleepBinding.inflate(inflater, container, false)\r\n        return binding.root\r\n    }\r\n\r\n    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {\r\n        super.onViewCreated(view, savedInstanceState)\r\n\r\n        // ซ่อน ZZZ (ที่เราเพิ่งเพิ่มใน XML) ไว้ก่อน\r\n        binding.tvZzz.visibility = View.GONE\r\n\r\n        updateLightUI()\r\n        setupListeners()\r\n    }\r\n\r\n    override fun onResume() {\r\n        super.onResume()\r\n        loadPetState()\r\n    }\r\n\r\n    private fun loadPetState() {\r\n        val happiness = PetManager.happiness\r\n        val hunger = PetManager.hunger\r\n        val energy = PetManager.energy\r\n\r\n        // *** แก้ไขแล้ว (1) ***\r\n        binding.textViewPetName.text = PetManager.petName\r\n\r\n        binding.progressBarPlay.progress = happiness\r\n        binding.progressBarFood.progress = hunger\r\n        binding.progressBarSleep.progress = energy\r\n\r\n        updateAllBarColors(happiness, hunger, energy)\r\n    }\r\n\r\n    private fun setupListeners() {\r\n        val viewPager = (activity as MainActivity).binding.viewPager\r\n\r\n        // *** แก้ไขแล้ว (2) ***\r\n        binding.buttonArrowLeft.setOnClickListener {\r\n            if (isSleeping) return@setOnClickListener\r\n            (activity as MainActivity).binding.viewPager.currentItem = 1 // ไปหน้า Eat\r\n        }\r\n        // *** แก้ไขแล้ว (3) ***\r\n        binding.buttonArrowRight.setOnClickListener {\r\n            if (isSleeping) return@setOnClickListener\r\n            (activity as MainActivity).binding.viewPager.currentItem = 0 // ไปหน้า Play\r\n        }\r\n\r\n        binding.buttonPillow.setOnClickListener {\r\n            if (!isSleeping) {\r\n                goToSleep()\r\n            }\r\n        }\r\n\r\n        binding.buttonLamp.setOnClickListener {\r\n            if (isSleeping) return@setOnClickListener\r\n            toggleLights()\r\n        }\r\n    }\r\n\r\n    private fun goToSleep() {\r\n        isSleeping = true\r\n\r\n        if (isLightsOn) {\r\n            isLightsOn = false\r\n            updateLightUI()\r\n        }\r\n\r\n        // *** แก้ไขแล้ว (4) ***\r\n        // นี่คือ id ของรูป Peanut\r\n        binding.imageViewPeanut.animate().translationY(150f).setDuration(500).start()\r\n\r\n        // นี่คือ id ของ Zzz ที่เราเพิ่งเพิ่มใน XML\r\n        binding.tvZzz.visibility = View.VISIBLE\r\n\r\n        PetManager.energy += 40\r\n        PetManager.hunger -= 10\r\n        loadPetState()\r\n\r\n        Handler(Looper.getMainLooper()).postDelayed({\r\n            wakeUp()\r\n        }, 3000)\r\n    }\r\n\r\n    private fun wakeUp() {\r\n        isSleeping = false\r\n\r\n        // *** แก้ไขแล้ว (5) ***\r\n        binding.imageViewPeanut.animate().translationY(0f).setDuration(500).start()\r\n        binding.tvZzz.visibility = View.GONE\r\n\r\n        loadPetState()\r\n    }\r\n\r\n    private fun toggleLights() {\r\n        isLightsOn = !isLightsOn\r\n        updateLightUI()\r\n\r\n        if (!isLightsOn) {\r\n            PetManager.energy += 10\r\n            loadPetState()\r\n        }\r\n    }\r\n\r\n    // ฟังก์ชันนี้ OK แล้ว เพราะ XML ของคุณมี @color/sleep_background_light\r\n    private fun updateLightUI() {\r\n        val colorRes = if (isLightsOn) {\r\n            R.color.sleep_background_light\r\n        } else {\r\n            R.color.sleep_background_dark // \uD83D\uDC48 (ต้องแน่ใจว่ามีสีนี้ใน colors.xml)\r\n        }\r\n        binding.root.setBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))\r\n    }\r\n\r\n    private fun updateAllBarColors(play: Int, food: Int, sleep: Int) {\r\n        // ของเราจะเปลี่ยนสีตามพลัง\r\n        updateBarColor(binding.progressBarPlay, play, R.color.status_green) // \uD83D\uDC48 (ต้องมีสีนี้)\r\n        updateBarColor(binding.progressBarFood, food, R.color.status_green)\r\n        updateBarColor(binding.progressBarSleep, sleep, R.color.status_green)\r\n    }\r\n\r\n    private fun updateBarColor(progressBar: ProgressBar, value: Int, defaultColorRes: Int) {\r\n        val colorRes = when {\r\n            value <= 20 -> R.color.status_red\r\n            value <= 50 -> R.color.status_yellow\r\n            else -> defaultColorRes\r\n        }\r\n        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))\r\n        progressBar.progressTintList = colorStateList\r\n    }\r\n\r\n    override fun onDestroyView() {\r\n        super.onDestroyView()\r\n        _binding = null\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/peanut/SleepFragment.kt b/app/src/main/java/com/example/peanut/SleepFragment.kt
+--- a/app/src/main/java/com/example/peanut/SleepFragment.kt	(revision 73ed698b2f6a2ef2b9e9901b4e37a00dbddbd7d4)
++++ b/app/src/main/java/com/example/peanut/SleepFragment.kt	(date 1762696034631)
+@@ -87,19 +87,17 @@
+     private fun goToSleep() {
+         isSleeping = true
+ 
+-        if (isLightsOn) {
+-            isLightsOn = false
+-            updateLightUI()
+-        }
+-
+-        // *** แก้ไขแล้ว (4) ***
+-        // นี่คือ id ของรูป Peanut
+         binding.imageViewPeanut.animate().translationY(150f).setDuration(500).start()
+-
+-        // นี่คือ id ของ Zzz ที่เราเพิ่งเพิ่มใน XML
+         binding.tvZzz.visibility = View.VISIBLE
+ 
+-        PetManager.energy += 40
++        if (!isLightsOn) {
++
++            PetManager.energy += 30
++        } else {
++
++            PetManager.energy += 5
++        }
++
+         PetManager.hunger -= 10
+         loadPetState()
+ 
+@@ -138,13 +136,17 @@
+         binding.root.setBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))
+     }
+ 
++
++    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
+     private fun updateAllBarColors(play: Int, food: Int, sleep: Int) {
+-        // ของเราจะเปลี่ยนสีตามพลัง
++        // XML ของคุณใช้สีชมพู/เขียว/เหลือง แต่ Logic ของเราจะเปลี่ยนสีตามพลัง
++        // เราจะยึดตาม Logic นี้
+         updateBarColor(binding.progressBarPlay, play, R.color.status_green) // 👈 (ต้องมีสีนี้)
+         updateBarColor(binding.progressBarFood, food, R.color.status_green)
+         updateBarColor(binding.progressBarSleep, sleep, R.color.status_green)
+     }
+ 
++    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
+     private fun updateBarColor(progressBar: ProgressBar, value: Int, defaultColorRes: Int) {
+         val colorRes = when {
+             value <= 20 -> R.color.status_red
