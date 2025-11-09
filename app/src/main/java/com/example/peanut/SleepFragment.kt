@@ -31,11 +31,39 @@ class SleepFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ซ่อน ZZZ (ที่เราเพิ่งเพิ่มใน XML) ไว้ก่อน
+        // ซ่อนZZZ
         binding.tvZzz.visibility = View.GONE
 
         updateLightUI()
         setupListeners()
+
+        // รับhappy
+        PetManager.happinessData.observe(viewLifecycleOwner) { newHappiness ->
+            binding.progressBarPlay.progress = newHappiness
+            updateBarColor(
+                binding.progressBarPlay,
+                newHappiness,
+                R.color.status_green
+            ) // (หรือสีเริ่มต้นของหลอดนี้)
+        }
+        // รับhunger
+        PetManager.hungerData.observe(viewLifecycleOwner) { newHunger ->
+            binding.progressBarFood.progress = newHunger
+            updateBarColor(
+                binding.progressBarFood,
+                newHunger,
+                R.color.status_green
+            ) // (หรือสีเริ่มต้นของหลอดนี้)
+        }
+        // รับenergy
+        PetManager.energyData.observe(viewLifecycleOwner) { newEnergy ->
+            binding.progressBarSleep.progress = newEnergy
+            updateBarColor(
+                binding.progressBarSleep,
+                newEnergy,
+                R.color.status_green
+            ) // (หรือสีเริ่มต้นของหลอดนี้)
+        }
     }
 
     override fun onResume() {
@@ -48,9 +76,7 @@ class SleepFragment : Fragment() {
         val hunger = PetManager.hunger
         val energy = PetManager.energy
 
-        // *** แก้ไขแล้ว (1) ***
         binding.textViewPetName.text = PetManager.petName
-
         binding.progressBarPlay.progress = happiness
         binding.progressBarFood.progress = hunger
         binding.progressBarSleep.progress = energy
@@ -61,12 +87,10 @@ class SleepFragment : Fragment() {
     private fun setupListeners() {
         val viewPager = (activity as MainActivity).binding.viewPager
 
-        // *** แก้ไขแล้ว (2) ***
-        binding.buttonArrowLeft.setOnClickListener {
+        binding.buttonArrowLeft.setOnClickListener { //ปุ่มหน้าซ้าย-ขวา
             if (isSleeping) return@setOnClickListener
             (activity as MainActivity).binding.viewPager.currentItem = 1 // ไปหน้า Eat
         }
-        // *** แก้ไขแล้ว (3) ***
         binding.buttonArrowRight.setOnClickListener {
             if (isSleeping) return@setOnClickListener
             (activity as MainActivity).binding.viewPager.currentItem = 0 // ไปหน้า Play
@@ -77,7 +101,6 @@ class SleepFragment : Fragment() {
                 goToSleep()
             }
         }
-
         binding.buttonLamp.setOnClickListener {
             if (isSleeping) return@setOnClickListener
             toggleLights()
@@ -85,16 +108,15 @@ class SleepFragment : Fragment() {
     }
 
     private fun goToSleep() {
+        //เงื่อนไขและค่าที่ฟื้นฟูจากการนอน
         isSleeping = true
 
         binding.imageViewPeanut.animate().translationY(150f).setDuration(500).start()
         binding.tvZzz.visibility = View.VISIBLE
 
         if (!isLightsOn) {
-
             PetManager.energy += 30
         } else {
-
             PetManager.energy += 5
         }
 
@@ -116,6 +138,7 @@ class SleepFragment : Fragment() {
     }
 
     private fun toggleLights() {
+        //เปิด-ปิดไฟ
         isLightsOn = !isLightsOn
         updateLightUI()
 
@@ -125,34 +148,31 @@ class SleepFragment : Fragment() {
         }
     }
 
-    // ฟังก์ชันนี้ OK แล้ว เพราะ XML ของคุณมี @color/sleep_background_light
     private fun updateLightUI() {
+        //เปลี่ยนสีพื้นหลัง-เปิดปิดไฟ
         val colorRes = if (isLightsOn) {
             R.color.sleep_background_light
         } else {
-            R.color.sleep_background_dark // 👈 (ต้องแน่ใจว่ามีสีนี้ใน colors.xml)
+            R.color.sleep_background_dark
         }
         binding.root.setBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))
     }
 
-
-    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
     private fun updateAllBarColors(play: Int, food: Int, sleep: Int) {
-        // XML ของคุณใช้สีชมพู/เขียว/เหลือง แต่ Logic ของเราจะเปลี่ยนสีตามพลัง
-        // เราจะยึดตาม Logic นี้
+        // แสดงผลสีบนหลอดต่ามค่าพลังที่เหลืออยู่
         updateBarColor(binding.progressBarPlay, play, R.color.status_green)
         updateBarColor(binding.progressBarFood, food, R.color.status_green)
         updateBarColor(binding.progressBarSleep, sleep, R.color.status_green)
     }
 
-    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
     private fun updateBarColor(progressBar: ProgressBar, value: Int, defaultColorRes: Int) {
         val colorRes = when {
             value <= 20 -> R.color.status_red
             value <= 50 -> R.color.status_yellow
             else -> defaultColorRes
         }
-        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))
+        val colorStateList =
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), colorRes))
         progressBar.progressTintList = colorStateList
     }
 

@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         adapter = ViewPagerAdapter(this)
 
         binding.viewPager.adapter = adapter
-        binding.viewPager.isUserInputEnabled = true
+        binding.viewPager.isUserInputEnabled = false //ผู้ใช้เลื่อนหน้าจอได้มั้ย
 
         // chech onGameOver at PetManager
         PetManager.onGameOver.observe(this) { isGameOver ->

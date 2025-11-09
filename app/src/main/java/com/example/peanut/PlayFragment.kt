@@ -26,6 +26,22 @@ class PlayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
+
+        // รับhappy
+        PetManager.happinessData.observe(viewLifecycleOwner) { newHappiness ->
+            binding.progressBarPlay.progress = newHappiness
+            updateBarColor(binding.progressBarPlay, newHappiness, R.color.status_green) // (หรือสีเริ่มต้นของหลอดนี้)
+        }
+        // รับhunger
+        PetManager.hungerData.observe(viewLifecycleOwner) { newHunger ->
+            binding.progressBarFood.progress = newHunger
+            updateBarColor(binding.progressBarFood, newHunger, R.color.status_green) // (หรือสีเริ่มต้นของหลอดนี้)
+        }
+        // รับenergy
+        PetManager.energyData.observe(viewLifecycleOwner) { newEnergy ->
+            binding.progressBarSleep.progress = newEnergy
+            updateBarColor(binding.progressBarSleep, newEnergy, R.color.status_green) // (หรือสีเริ่มต้นของหลอดนี้)
+        }
     }
 
     override fun onResume() {
@@ -38,33 +54,27 @@ class PlayFragment : Fragment() {
         val hunger = PetManager.hunger
         val energy = PetManager.energy
 
-        // 2. อัปเดตชื่อ
-        // *** แก้ไขแล้ว (1) ***
-        binding.textViewPetName.text = PetManager.petName
+        binding.textViewPetName.text = PetManager.petName //ชื่อ
 
-        // 3. อัปเดตตัวเลขในหลอด
-        binding.progressBarPlay.progress = happiness
+        binding.progressBarPlay.progress = happiness //ค่าพลังงาน
         binding.progressBarFood.progress = hunger
         binding.progressBarSleep.progress = energy
 
-        // 4. สั่งอัปเดตสี!
         updateAllBarColors(happiness, hunger, energy)
     }
 
     private fun setupListeners() {
-        // 1. ปุ่มลูกศร (เชื่อมกับ ViewPager ใน MainActivity)
+//ปุ่มเปลี่ยนหน้า
         val viewPager = (activity as MainActivity).binding.viewPager
 
-        // *** แก้ไขแล้ว (2) ***
         binding.buttonArrowLeft.setOnClickListener {
             (activity as MainActivity).binding.viewPager.currentItem = 2 // ไปหน้า Sleep (หน้าสุดท้าย)
         }
-        // *** แก้ไขแล้ว (3) ***
         binding.buttonArrowRight.setOnClickListener {
             (activity as MainActivity).binding.viewPager.currentItem = 1 // ไปหน้า Eat
         }
 
-        // 2. ปุ่มไอเท็ม (ID เหล่านี้ถูกต้องแล้วตามโค้ดเก่าของคุณ)
+
         binding.buttonBall.setOnClickListener {
             PetManager.happiness += 15
             PetManager.energy -= 10
@@ -82,7 +92,7 @@ class PlayFragment : Fragment() {
         }
     }
 
-
+    // แสดงผลสีบนหลอดต่ามค่าพลังที่เหลืออยู่
     private fun updateAllBarColors(play: Int, food: Int, sleep: Int) {
         updateBarColor(binding.progressBarPlay, play, R.color.status_green)
         updateBarColor(binding.progressBarFood, food, R.color.status_green)

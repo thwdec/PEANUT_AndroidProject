@@ -35,9 +35,7 @@ class GameOverActivity : AppCompatActivity() {
         binding.imageViewDeadPeanut.colorFilter = filter
 
         binding.buttonTryAgain.setOnClickListener {
-            // Intent to Name
             val intent = Intent(this, NameActivity::class.java)
-
             // clear
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
