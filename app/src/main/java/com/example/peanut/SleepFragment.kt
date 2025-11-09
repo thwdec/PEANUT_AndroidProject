@@ -138,17 +138,13 @@ class SleepFragment : Fragment() {
         binding.root.setBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))
     }
 
-
-    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
     private fun updateAllBarColors(play: Int, food: Int, sleep: Int) {
-        // XML ของคุณใช้สีชมพู/เขียว/เหลือง แต่ Logic ของเราจะเปลี่ยนสีตามพลัง
-        // เราจะยึดตาม Logic นี้
+        // ของเราจะเปลี่ยนสีตามพลัง
         updateBarColor(binding.progressBarPlay, play, R.color.status_green) // 👈 (ต้องมีสีนี้)
         updateBarColor(binding.progressBarFood, food, R.color.status_green)
         updateBarColor(binding.progressBarSleep, sleep, R.color.status_green)
     }
 
-    // ฟังก์ชันนี้จะ "แดง" ถ้าคุณยังไม่ได้เพิ่มสีใน colors.xml
     private fun updateBarColor(progressBar: ProgressBar, value: Int, defaultColorRes: Int) {
         val colorRes = when {
             value <= 20 -> R.color.status_red
