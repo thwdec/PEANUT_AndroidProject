@@ -51,6 +51,7 @@ object PetManager {
             saveInt(KEY_HAPPINESS, newValue) // บังคับให้อยู่ระหว่าง 0-100
             if (newValue <= 0) {
                 onGameOver.postValue(true) // gameover
+                stopDecayTimer()
             }
         }
 
@@ -62,6 +63,7 @@ object PetManager {
             saveInt(KEY_HUNGER, newValue)
             if (newValue <= 0) {
                 onGameOver.postValue(true)
+                stopDecayTimer()
             }
         }
 
@@ -72,8 +74,27 @@ object PetManager {
             saveInt(KEY_ENERGY, newValue)
             if (newValue <= 0) {
                 onGameOver.postValue(true)
+                stopDecayTimer()
             }
         }
+
+    private val statDecayRunnable = object : Runnable {
+        //ลดค่าพลังทุก 30 วิ
+        override fun run() {
+            hunger -= 1
+            happiness -= 1
+            energy -= 2
+            timerHandler.postDelayed(this, DECAY_INTERVAL)
+        }
+    }
+    fun startDecayTimer() { //เริ่มนับ
+        timerHandler.removeCallbacks(statDecayRunnable)
+        timerHandler.postDelayed(statDecayRunnable, DECAY_INTERVAL)
+    }
+
+    fun stopDecayTimer() { //หยุดนับ
+        timerHandler.removeCallbacks(statDecayRunnable)
+    }
 
     // ฟังก์ชันสำหรับรีเซ็ตค่า เมื่อเริ่มเกมใหม่
     fun startNewGame(name: String) {
@@ -81,5 +102,7 @@ object PetManager {
         happiness = DEFAULT_STAT
         hunger = DEFAULT_STAT
         energy = DEFAULT_STAT
+
+        startDecayTimer()
     }
 }
